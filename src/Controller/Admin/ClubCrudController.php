@@ -4,6 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\Club;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class ClubCrudController extends AbstractCrudController
 {
@@ -12,14 +16,16 @@ class ClubCrudController extends AbstractCrudController
         return Club::class;
     }
 
-    /*
+    
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
-        ];
+        yield TextField::new('name');
+        yield TextareaField::new('description')
+            ->hideOnIndex()
+        ;
+        yield BooleanField::new('isPublic');
+        yield DateTimeField::new('createdAt')
+            ->onlyOnIndex();
     }
-    */
+    
 }

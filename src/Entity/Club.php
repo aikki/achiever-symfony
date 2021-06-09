@@ -10,6 +10,7 @@ use App\Repository\ClubRepository;
 
 /**
  * @ORM\Entity(repositoryClass=ClubRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Club
 {
@@ -39,6 +40,11 @@ class Club
      * @ORM\OneToMany(targetEntity=Goal::class, mappedBy="club", orphanRemoval=true)
      */
     private $goals;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
 
     public function __construct()
     {
@@ -119,5 +125,24 @@ class Club
         }
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+    /**
+    * @ORM\PrePersist
+    */
+    public function setCreatedAtValue()
+    {
+        $this->createdAt = new \DateTime();
     }
 }

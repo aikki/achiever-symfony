@@ -46,9 +46,15 @@ class Club
      */
     private $createdAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserClub::class, mappedBy="club", orphanRemoval=true)
+     */
+    private $userClubs;
+
     public function __construct()
     {
         $this->goals = new ArrayCollection();
+        $this->userClubs = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -144,5 +150,35 @@ class Club
     public function setCreatedAtValue()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|UserClub[]
+     */
+    public function getUserClubs(): Collection
+    {
+        return $this->userClubs;
+    }
+
+    public function addUserClub(UserClub $userClub): self
+    {
+        if (!$this->userClubs->contains($userClub)) {
+            $this->userClubs[] = $userClub;
+            $userClub->setClub($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserClub(UserClub $userClub): self
+    {
+        if ($this->userClubs->removeElement($userClub)) {
+            // set the owning side to null (unless already changed)
+            if ($userClub->getClub() === $this) {
+                $userClub->setClub(null);
+            }
+        }
+
+        return $this;
     }
 }

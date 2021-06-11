@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -52,6 +54,16 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserClub::class, mappedBy="member", orphanRemoval=true)
+     */
+    private $userClubs;
+
+    public function __construct()
+    {
+        $this->userClubs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -180,5 +192,35 @@ class User implements UserInterface
     public function setCreatedAtValue()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|UserClub[]
+     */
+    public function getUserClubs(): Collection
+    {
+        return $this->userClubs;
+    }
+
+    public function addUserClub(UserClub $userClub): self
+    {
+        if (!$this->userClubs->contains($userClub)) {
+            $this->userClubs[] = $userClub;
+            $userClub->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserClub(UserClub $userClub): self
+    {
+        if ($this->userClubs->removeElement($userClub)) {
+            // set the owning side to null (unless already changed)
+            if ($userClub->getMember() === $this) {
+                $userClub->setMember(null);
+            }
+        }
+
+        return $this;
     }
 }

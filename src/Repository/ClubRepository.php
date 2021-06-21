@@ -15,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ClubRepository extends ServiceEntityRepository
 {
-    public const PAGINATOR_PER_PAGE = 5;
+    public const PAGINATOR_PER_PAGE = 3;
 
     public function __construct(ManagerRegistry $registry)
     {

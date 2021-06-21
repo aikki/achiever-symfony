@@ -1,20 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ClubController!{% endblock %}
+{% block title %}Lista klubów{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/home/patryk/sm/achiever/src/Controller/ClubController.php'|file_link(0) }}">src/Controller/ClubController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/home/patryk/sm/achiever/templates/club/index.html.twig'|file_link(0) }}">templates/club/index.html.twig</a></code></li>
-    </ul>
-</div>
+    <div class="row">
+        <div class="col">
+            <ul class="list-group mt-4">
+            {% for club in clubs %}
+                <li class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ club.name }}</h5>
+                        {% if app.user.isMember(club) %}
+                            <a href="{{ path('club_show', {id : club.id}) }}" class="btn btn-primary">Wejdź</a>
+                        {% elseif club.isPublic %}
+                            <a href="{{ path('club_join', {id : club.id}) }}" class="btn btn-success">Dołącz</a>
+                        {% else %}
+                            <small class="badge bg-danger">Prywatny</small>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-muted">{{ club.description }}</p>
+                </li>
+            {% endfor %}
+            </ul>
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if prev < 0 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ path('club', { offset: prev }) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% for i in range(0, pages) %}
+                        <li class="page-item {% if offset == (i * perPage) %}active{% endif %}"><a class="page-link" href="{{ path('club', { offset: (i * perPage) }) }}">{{ i + 1 }}</a></li>
+                    {% endfor %}
+                    <li class="page-item {% if next >= clubs|length %}disabled{% endif %}">
+                        <a class="page-link" href="{{ path('club', { offset: next }) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+                </nav>
+        </div>
+        <div class="col-3">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Posiadasz kod?</h5>
+                    <p class="card-text">Jeśli dostałeś kod dostępu od właściciela prywatnego klubu wpisz go poniżej aby dołączyć:</p>
+                    
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="kod dostępu" aria-label="kod dostępu" aria-describedby="button-code-join">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-code-join">Dołącz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -25,7 +25,7 @@ class ClubRepository extends ServiceEntityRepository
     public function getClubPaginator(int $offset): Paginator
     {
         $query = $this->createQueryBuilder('c')
-            ->orderBy('c.id', 'DESC')
+            ->orderBy('c.name', 'ASC')
             ->setMaxResults(self::PAGINATOR_PER_PAGE)
             ->setFirstResult($offset)
             ->getQuery();

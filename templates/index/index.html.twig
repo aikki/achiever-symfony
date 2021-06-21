@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamification{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <h1>Gamification</h1>
+
+    <table>
+        <thead>
+            <th>Club Name</th><th>Join</th>
+        </thead>
+        <tbody>
+            {% for club in clubs %}
+                <tr>
+                    <td>{{ club.name }}</td>
+                    <td>
+                        {% if club.isPublic %}
+                            <button>Join</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if prev >= 0 %}
+        <a href="{{ path('index', { offset: prev }) }}">&lt; Prev</a>
+    {% endif %}
+    {% if next < clubs|length %}
+        <a href="{{ path('index', { offset: next }) }}">Next &gt;</a>
+    {% endif %}
+    
+    <div>
+        <h3>My clubs:</h3>
+        <ul>
+            {% for club in myClubs %}
+                <li>{{ club.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+{% endblock %}

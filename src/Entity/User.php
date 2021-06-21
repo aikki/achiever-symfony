@@ -226,8 +226,8 @@ class User implements UserInterface
 
     public function isMember(Club $club): bool
     {
-        return $this->getUserClubs()->forAll(function($key, $userClub) use ($club) {
-            return $userClub->getClub() === $club;
+        return !$this->getUserClubs()->forAll(function($key, $userClub) use ($club) {
+            return $userClub->getClub() !== $club;
         });
     }
 }

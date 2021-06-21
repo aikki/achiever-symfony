@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserClubRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -41,6 +42,16 @@ class UserClub
      * @ORM\Column(type="boolean")
      */
     private $isOwner;
+
+    public function __construct(User $user, Club $club)
+    {
+        if ($user->isMember($club)) {
+            throw new Exception('Can`t join club for the second time.');
+        }
+        $this->setMember($user);
+        $this->setClub($club);
+        $this->setIsOwner(false);
+    }
 
     public function getId(): ?int
     {

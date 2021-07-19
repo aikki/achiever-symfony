@@ -51,6 +51,11 @@ class Club
      */
     private $userClubs;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $joinCode;
+
     public function __construct()
     {
         $this->goals = new ArrayCollection();
@@ -178,6 +183,18 @@ class Club
                 $userClub->setClub(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getJoinCode(): ?string
+    {
+        return $this->joinCode;
+    }
+
+    public function setJoinCode(?string $joinCode): self
+    {
+        $this->joinCode = $joinCode;
 
         return $this;
     }

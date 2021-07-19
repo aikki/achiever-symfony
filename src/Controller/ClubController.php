@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Club;
 use App\Entity\UserClub;
+use App\Form\CodeJoinFormType;
 use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -20,6 +21,13 @@ class ClubController extends AbstractController
     {
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $clubRepository->getClubPaginator($offset);
+
+        $codeJoin = $this->createForm(CodeJoinFormType::class);
+        $codeJoin->handleRequest($request);
+
+        if ($codeJoin->isSubmitted() && $codeJoin->isValid()) {
+            
+        }
 
         return $this->render('club/index.html.twig', [
             'clubs' => $paginator,

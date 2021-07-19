@@ -26,15 +26,15 @@
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if prev < 0 %}disabled{% endif %}">
-                        <a class="page-link" href="{{ path('club', { offset: prev }) }}" aria-label="Previous">
+                        <a class="page-link" href="{{ path('clubs', { offset: prev }) }}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     {% for i in range(0, pages) %}
-                        <li class="page-item {% if offset == (i * perPage) %}active{% endif %}"><a class="page-link" href="{{ path('club', { offset: (i * perPage) }) }}">{{ i + 1 }}</a></li>
+                        <li class="page-item {% if offset == (i * perPage) %}active{% endif %}"><a class="page-link" href="{{ path('clubs', { offset: (i * perPage) }) }}">{{ i + 1 }}</a></li>
                     {% endfor %}
                     <li class="page-item {% if next >= clubs|length %}disabled{% endif %}">
-                        <a class="page-link" href="{{ path('club', { offset: next }) }}" aria-label="Next">
+                        <a class="page-link" href="{{ path('clubs', { offset: next }) }}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ClubController extends AbstractController
 {
-    #[Route('/clubs', name: 'club')]
+    #[Route('/clubs', name: 'clubs')]
     public function index(Request $request, ClubRepository $clubRepository): Response
     {
         $offset = max(0, $request->query->getInt('offset', 0));

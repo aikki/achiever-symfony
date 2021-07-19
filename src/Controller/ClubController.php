@@ -44,7 +44,7 @@ class ClubController extends AbstractController
     public function show(Club $club): Response
     {
         return $this->render('club/show.html.twig', [
-            'controller_name' => $club->getName(),
+            'controller_name' => $club->getJoinCode(),
         ]);
     }
 

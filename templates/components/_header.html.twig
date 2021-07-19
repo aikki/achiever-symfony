@@ -21,7 +21,8 @@
             {% for club in myClubs %}
             <li><a class="dropdown-item" href="#">{{ club.name }}</a></li>
             {% endfor %}
-            <li class="divider"><a class="dropdown-item" href="#">Stwórz klub</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{{ path('club_create') }}">Stwórz klub</a></li>
           </ul>
         </li>
         {% endif %}

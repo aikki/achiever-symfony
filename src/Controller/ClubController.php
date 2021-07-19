@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Club;
 use App\Entity\UserClub;
+use App\Form\ClubType;
 use App\Form\CodeJoinFormType;
 use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +40,7 @@ class ClubController extends AbstractController
         ]);
     }
     
-    #[Route('/clubs/{id}', name: 'club_show')]
+    #[Route('/clubs/{id<\d+>}', name: 'club_show')]
     public function show(Club $club): Response
     {
         return $this->render('club/show.html.twig', [
@@ -47,7 +48,7 @@ class ClubController extends AbstractController
         ]);
     }
 
-    #[Route('/clubs/join/{id}', name: 'club_join')]
+    #[Route('/clubs/join/{id<\d+>}', name: 'club_join')]
     public function join(Club $club, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isGranted('ROLE_USER')) {
@@ -66,5 +67,31 @@ class ClubController extends AbstractController
             return new RedirectResponse($this->generateUrl('club'));
         }
 
+    }
+    
+    #[Route('/clubs/create', name: 'club_create')]
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $club = new Club();
+        $club->setIsPublic(true);
+        $form = $this->createForm(ClubType::class, $club);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $entityManager->persist($club);
+            $entityManager->flush();
+
+            $userClub = new UserClub($this->getUser(), $club);
+            $userClub->setIsOwner(true);
+            $entityManager->persist($userClub);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        }
+
+        return $this->render('club/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

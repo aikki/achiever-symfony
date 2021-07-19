@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stwórz klub{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <h1 class="display-4 my-3">Stwórz klub</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    <label for="club_name" class="form-label">Nazwa klubu</label>
+                    {{ form_widget(form.name, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="mb-3">
+                    <label for="club_description" class="form-label">Opis</label>
+                    {{ form_widget(form.description, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="mb-3 form-check form-switch">
+                    <label class="form-check-label" for="club_isPublic">Klub publiczny</label>
+                    {{ form_widget(form.isPublic, { attr: { class: 'form-check-input' } }) }}
+                </div>
+                <button type="submit" class="btn btn-primary">Stwórz</button>
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+{% endblock %}

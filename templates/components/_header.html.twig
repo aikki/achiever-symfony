@@ -19,7 +19,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for club in myClubs %}
-            <li><a class="dropdown-item" href="#">{{ club.name }}</a></li>
+            <li><a class="dropdown-item" href="{{ path('club_show', { id: club.id }) }}">{{ club.name }}</a></li>
             {% endfor %}
             <li><hr class="dropdown-divider" /></li>
             <li><a class="dropdown-item" href="{{ path('club_create') }}">Stwórz klub</a></li>

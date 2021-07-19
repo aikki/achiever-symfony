@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Club;
+use App\Entity\User;
 use App\Entity\UserClub;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,32 +21,27 @@ class UserClubRepository extends ServiceEntityRepository
         parent::__construct($registry, UserClub::class);
     }
 
-    // /**
-    //  * @return UserClub[] Returns an array of UserClub objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findOneByUserAndClub(User $user, Club $club): ?UserClub
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserClub
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('u.member = :user')
+            ->andWhere('u.club = :club')
+            ->setParameter('user', $user)
+            ->setParameter('club', $club)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+
+    public function findOwner(Club $club): ?UserClub
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.club = :club')
+            ->andWhere('u.isOwner = :owner')
+            ->setParameter('club', $club)
+            ->setParameter('owner', true)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

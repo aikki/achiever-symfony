@@ -7,6 +7,7 @@ use App\Entity\UserClub;
 use App\Form\ClubType;
 use App\Form\CodeJoinFormType;
 use App\Repository\ClubRepository;
+use App\Repository\UserClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,10 +42,24 @@ class ClubController extends AbstractController
     }
     
     #[Route('/clubs/{id<\d+>}', name: 'club_show')]
-    public function show(Club $club): Response
+    public function show(Club $club, UserClubRepository $userClubRepository): Response
     {
+        $userClub = $userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+
+        $owner = $userClubRepository->findOwner($club);
+        if ($owner === null) {
+            $owner = '';
+        } else {
+            $owner = (string) $owner->getMember();
+        }
+
+        $goals = $club->getGoals();
+
         return $this->render('club/show.html.twig', [
-            'controller_name' => $club->getJoinCode(),
+            'club' => $club,
+            'is_owner' => $userClub->getIsOwner(),
+            'owner' => $owner,
+            'goals' => $goals,
         ]);
     }
 
@@ -93,5 +108,16 @@ class ClubController extends AbstractController
         return $this->render('club/create.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+    
+    #[Route('/clubs/regenerate_code/{id<\d+>}', name: 'club_regenerate_code')]
+    public function regenerateCode(Club $club, EntityManagerInterface $entityManager): Response
+    {
+        # if owner
+        $club->setJoinCode(substr(bin2hex(random_bytes(7)), 0, 7));
+        $entityManager->persist($club);
+        $entityManager->flush();
+        
+        return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
     }
 }

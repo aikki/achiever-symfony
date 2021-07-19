@@ -3,6 +3,8 @@
 {% block title %}Lista klubów{% endblock %}
 
 {% block body %}
+
+<div class="container">
     <div class="row">
         <div class="col">
             <ul class="list-group mt-4">
@@ -11,11 +13,11 @@
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ club.name }}</h5>
                         {% if app.user.isMember(club) %}
-                            <a href="{{ path('club_show', {id : club.id}) }}" class="btn btn-primary">Wejdź</a>
+                            <a href="{{ path('club_show', {id : club.id}) }}" class="btn btn-primary mt-3">Wejdź</a>
                         {% elseif club.isPublic %}
-                            <a href="{{ path('club_join', {id : club.id}) }}" class="btn btn-success">Dołącz</a>
+                            <a href="{{ path('club_join', {id : club.id}) }}" class="btn btn-success mt-3">Dołącz</a>
                         {% else %}
-                            <small class="badge bg-danger">Prywatny</small>
+                            <button class="btn btn-danger mt-3" disabled>Prywatny</button>
                         {% endif %}
                     </div>
                     
@@ -55,4 +57,5 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

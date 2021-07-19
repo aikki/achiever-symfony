@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ path('club_show', { id: club.id }) }}">{{ club.name }}</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#clubNavbarSupportedContent" aria-controls="clubNavbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="clubNavbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if is_owner %}
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ path('clubs') }}">Utwórz cel</a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        {% if is_owner %}
+        <div class="d-flex">
+            <div class="input-group">
+                <div class="input-group-text" id="btnGroupAddon2">Kod dostępu</div>
+                <input type="text" class="form-control" placeholder="xxxxxxx" aria-label="Kod dostępu" aria-describedby="btnGroupAddon2" readonly value="{{ club.joinCode }}" />
+                <a href="{{ path('club_regenerate_code', { id: club.id }) }}" class="btn btn-success">Wygeneruj nowy</a>
+            </div>
+        </div>
+        {% else %}
+            <div class="d-flex">
+                <div class="input-group">
+                    <div class="input-group-text" id="clubOwner">Właściciel</div>
+                    <input type="text" class="form-control" placeholder="n/d" aria-label="Kod dostępu" aria-describedby="clubOwner" readonly value="{{ owner }}" />
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</nav>

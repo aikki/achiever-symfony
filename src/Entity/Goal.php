@@ -33,6 +33,8 @@ class Goal
      */
     private $club;
 
+    private $isAchieved = null;
+
     public function __toString(): string
     {
         return $this->getName();
@@ -75,6 +77,18 @@ class Goal
     public function setClub(?Club $club): self
     {
         $this->club = $club;
+
+        return $this;
+    }
+
+    public function getIsAchieved(): ?bool
+    {
+        return $this->isAchieved;
+    }
+
+    public function setIsAchieved(?bool $isAchieved): self
+    {
+        $this->isAchieved = $isAchieved;
 
         return $this;
     }

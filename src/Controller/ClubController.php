@@ -8,6 +8,7 @@ use App\Form\ClubType;
 use App\Form\CodeJoinFormType;
 use App\Repository\ClubRepository;
 use App\Repository\UserClubRepository;
+use App\Service\UserGoalManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,7 +43,7 @@ class ClubController extends AbstractController
     }
     
     #[Route('/clubs/{id<\d+>}', name: 'club_show')]
-    public function show(Club $club, UserClubRepository $userClubRepository): Response
+    public function show(Club $club, UserClubRepository $userClubRepository, UserGoalManager $userGoalManager): Response
     {
         $userClub = $userClubRepository->findOneByUserAndClub($this->getUser(), $club);
 
@@ -53,7 +54,7 @@ class ClubController extends AbstractController
             $owner = (string) $owner->getMember();
         }
 
-        $goals = $club->getGoals();
+        $goals = $userGoalManager->fillGoals($this->getUser(), ...$club->getGoals());
 
         return $this->render('club/show.html.twig', [
             'club' => $club,

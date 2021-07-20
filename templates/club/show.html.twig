@@ -13,11 +13,24 @@
 				<ul class="list-group mt-4">
 					{% for goal in goals %}
 						<li class="list-group-item">
-							<div class="d-flex w-100 justify-content-between">
-								<h5 class="mb-1">{{ goal.name }}</h5>
-							</div>
+							<div class="row">
+								<div class="col">
+									<div class="d-flex w-100 justify-content-between">
+										<h5 class="mb-1 mt-2">{{ goal.name }}</h5>
+									</div>
 
-							<p class="text-muted">{{ goal.description }}</p>
+									<p class="text-muted">{{ goal.description }}</p>
+								</div>
+								<div class="col-12 col-md-2">
+									{% if goal.isAchieved %}
+										<button disabled class="btn btn-primary w-100">Wykonane</button>
+									{% elseif goal.isAchieved is null %}
+										<button disabled class="btn btn-dark">Status nieznany, odśwież stronę</button>
+									{% else %}
+										<a class="btn btn-success w-100" href="{{ path('goal_achieve', { id: goal.id }) }}">Wykonaj</a>
+									{% endif %}
+								</div>
+							</div>
 						</li>
 					{% endfor %}
 				</ul>

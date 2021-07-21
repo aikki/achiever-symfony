@@ -35,6 +35,11 @@ class Goal
 
     private $isAchieved = null;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $iconClassName;
+
     public function __toString(): string
     {
         return $this->getName();
@@ -89,6 +94,18 @@ class Goal
     public function setIsAchieved(?bool $isAchieved): self
     {
         $this->isAchieved = $isAchieved;
+
+        return $this;
+    }
+
+    public function getIconClassName(): ?string
+    {
+        return $this->iconClassName;
+    }
+
+    public function setIconClassName(string $iconClassName): self
+    {
+        $this->iconClassName = $iconClassName;
 
         return $this;
     }

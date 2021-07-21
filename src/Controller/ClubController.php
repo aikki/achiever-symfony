@@ -50,7 +50,7 @@ class ClubController extends AbstractController
         if ($userClub === null) {
             $this->addFlash('note', "Nie należysz do klubu {$club->getName()}");
 
-            return new RedirectResponse($this->generateUrl('clubs'));
+            return $this->redirectToRoute('clubs');
         }
 
         $owner = $userClubRepository->findOwner($club);
@@ -79,10 +79,10 @@ class ClubController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Dołączono do klubu.');
-            return new RedirectResponse($this->generateUrl('club_show', ['id' => $club->getId()]));
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
         } catch (Exception $e) {
             $this->addFlash('error', "Wystąpił błąd przy dołączaniu do klubu.");
-            return new RedirectResponse($this->generateUrl('club'));
+            return $this->redirectToRoute('club');
         }
 
     }

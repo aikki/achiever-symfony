@@ -2,19 +2,52 @@
 
 namespace App\Controller;
 
+use App\Entity\Club;
 use App\Entity\Goal;
+use App\Form\GoalType;
+use App\Repository\UserClubRepository;
 use App\Service\UserGoalManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GoalController extends AbstractController
 {
-    #[Route('/goal', name: 'goal')]
-    public function index(): Response
+    #[Route('/clubs/{id<\d+>}/goals/create', name: 'goal_create')]
+    public function create(Club $club, Request $request, EntityManagerInterface $entityManager, UserClubRepository $userClubRepository): Response
     {
-        return $this->render('goal/index.html.twig', [
-            'controller_name' => 'GoalController',
+        $userClub = $userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+        if ($userClub === null) {
+            $this->addFlash('note', "Nie należysz do klubu {$club->getName()}");
+
+            return $this->redirectToRoute('clubs');
+        }
+        if (!$userClub->getIsOwner()) {
+            $this->addFlash('note', "Nie jesteś właścicielem klubu {$club->getName()}");
+
+            return $this->redirectToRoute('club_show', [ 'id' => $club->getId() ]);
+        }
+        
+        $goal = new Goal();
+        $goal->setClub($club);
+        $form = $this->createForm(GoalType::class, $goal);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $entityManager->persist($goal);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        }
+
+        return $this->render('goal/create.html.twig', [
+            'form' => $form->createView(),
+            'club' => $club,
+            'is_owner' => $userClub->getIsOwner(),
         ]);
     }
 

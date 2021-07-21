@@ -5,6 +5,10 @@
 {% block body %}
 
 <div class="container">
+    {% for flashError in app.flashes('note') %}
+        <div class="alert alert-warning mt-3" role="alert">{{ flashError }}</div>
+    {% endfor %}
+
     <div class="row">
         <div class="col">
             <ul class="list-group mt-4">

@@ -43,9 +43,15 @@ class ClubController extends AbstractController
     }
     
     #[Route('/clubs/{id<\d+>}', name: 'club_show')]
-    public function show(Club $club, UserClubRepository $userClubRepository, UserGoalManager $userGoalManager): Response
+    public function show(Club $club, Request $request, UserClubRepository $userClubRepository, UserGoalManager $userGoalManager): Response
     {
         $userClub = $userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+
+        if ($userClub === null) {
+            $this->addFlash('note', "Nie należysz do klubu {$club->getName()}");
+
+            return new RedirectResponse($this->generateUrl('clubs'));
+        }
 
         $owner = $userClubRepository->findOwner($club);
         if ($owner === null) {
@@ -67,10 +73,6 @@ class ClubController extends AbstractController
     #[Route('/clubs/join/{id<\d+>}', name: 'club_join')]
     public function join(Club $club, EntityManagerInterface $entityManager): Response
     {
-        if (!$this->isGranted('ROLE_USER')) {
-            return new RedirectResponse($this->urlGenerator->generate('security_login'));
-        }
-
         try {
             $userClub = new UserClub($this->getUser(), $club);
             $entityManager->persist($userClub);

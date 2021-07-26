@@ -6,8 +6,7 @@ use App\Entity\Club;
 use App\Entity\UserClub;
 use App\Form\ClubType;
 use App\Form\CodeFormType;
-use App\Form\CodeJoinFormType;
-use App\Form\JoinFormType;
+use App\Form\SingleSubmitFormType;
 use App\Repository\ClubRepository;
 use App\Repository\UserClubRepository;
 use App\Service\UserGoalManager;
@@ -21,6 +20,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ClubController extends AbstractController
 {
+    private $userClubRepository;
+    private $clubOwner;
+
+    public function __construct(UserClubRepository $userClubRepository)
+    {
+        $this->userClubRepository = $userClubRepository;
+    }
+
     #[Route('/clubs', name: 'clubs')]
     public function index(Request $request, ClubRepository $clubRepository): Response
     {
@@ -44,9 +51,9 @@ class ClubController extends AbstractController
     }
     
     #[Route('/clubs/{id<\d+>}', name: 'club_show')]
-    public function show(Club $club, Request $request, UserClubRepository $userClubRepository, UserGoalManager $userGoalManager): Response
+    public function show(Club $club, Request $request, UserGoalManager $userGoalManager): Response
     {
-        $userClub = $userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+        $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
 
         if ($userClub === null) {
             $this->addFlash('note', "Nie należysz do klubu {$club->getName()}");
@@ -54,12 +61,7 @@ class ClubController extends AbstractController
             return $this->redirectToRoute('clubs');
         }
 
-        $owner = $userClubRepository->findOwner($club);
-        if ($owner === null) {
-            $owner = '';
-        } else {
-            $owner = (string) $owner->getMember();
-        }
+        $owner = $this->getClubOwner($club);
 
         $goals = $userGoalManager->fillGoals($this->getUser(), ...$club->getGoals());
 
@@ -79,7 +81,7 @@ class ClubController extends AbstractController
         $club = $clubRepository->findOneByCode($code);
 
         if ($club instanceof Club) {
-            $form = $this->createForm(CodeJoinFormType::class);
+            $form = $this->createForm(SingleSubmitFormType::class, null, [ 'label' => 'Join' ]);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 try {
@@ -94,12 +96,7 @@ class ClubController extends AbstractController
                     return $this->redirectToRoute('clubs');
                 }
             } else {
-                $owner = $userClubRepository->findOwner($club);
-                if ($owner === null) {
-                    $owner = '';
-                } else {
-                    $owner = (string) $owner->getMember();
-                }
+                $owner = $this->getClubOwner($club);
 
                 return $this->render('club/join.html.twig', [
                     'club' => $club,
@@ -156,15 +153,73 @@ class ClubController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    private function getClubOwner(Club $club, bool $object = false) {
+        if (empty($this->clubOwner)) {
+            $this->userOwner = $this->userClubRepository->findOwner($club);
+        }
+        
+        if ($object) {
+            return $this->userOwner;
+        }
+
+        if ($this->userOwner === null) {
+            return '';
+        } else {
+            return (string) $this->userOwner->getMember();
+        }
+    }
     
     #[Route('/clubs/regenerate_code/{id<\d+>}', name: 'club_regenerate_code')]
     public function regenerateCode(Club $club, EntityManagerInterface $entityManager): Response
     {
-        # if owner
-        $club->regenerateJoinCode();
-        $entityManager->persist($club);
-        $entityManager->flush();
+        $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+
+        if ($userClub === null) {
+            $this->addFlash('note', "Nie należysz do tego klubu.");
+            return $this->redirectToRoute('clubs');
+        }
+        if ($userClub->getIsOwner()) {
+            $club->regenerateJoinCode();
+            $entityManager->persist($club);
+            $entityManager->flush();
+            $this->addFlash('success', "Pomyślnie wygenerowano nowy kod dostępu.");
+        } else {
+            $this->addFlash('note', "Nie jesteś właścicielem klubu.");
+        }
         
         return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+    }
+    
+    #[Route('/clubs/leave/{id<\d+>}', name: 'club_leave')]
+    public function leave(Club $club, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+
+        if ($userClub === null) {
+            $this->addFlash('note', "Nie należysz do tego klubu.");
+        }
+        if ($userClub->getIsOwner()) {
+            $this->addFlash('note', "Nie możesz opuścić klubu, którego jesteś właścicielem.");
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        } else {
+            $form = $this->createForm(SingleSubmitFormType::class, null, [ 'label' => 'Leave' ]);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->remove($userClub);
+                $entityManager->flush();
+
+                $this->addFlash('success', "Pomyślnie opuściłeś klub.");
+            } else {
+                return $this->render('club/leave.html.twig', [
+                    'club' => $club,
+                    'form' => $form->createView(),
+                    'is_owner' => $userClub->getIsOwner(),
+                    'owner' => $this->getClubOwner($club),
+                ]);
+            }
+        }
+        
+        return $this->redirectToRoute('clubs');
     }
 }

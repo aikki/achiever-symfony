@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ club.name }}
+{% endblock %}
+
+{% block body %}
+	{% include 'club/components/_club_header.html.twig' %}
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h2 class="mt-3">Opuszczanie klubu</h2>
+				<div class="card mt-4">
+					<h3 class="card-header">
+						{{ club.name }} {% if not club.isPublic %}<span class="badge bg-danger">Prywatny</span>{% endif %}
+					</h3>
+					<div class="card-body">
+						<h5 class="card-title">Czy na pewno chcesz opuścić ten klub?</h5>
+						{% if not club.isPublic %}
+							<p class="card-text">
+								Klub jest prywatny, więc nie będziesz mógł do niego wrócić bez kodu dostępu.
+							</p>
+						{% endif %}
+					</div>
+					<div class="card-footer">
+						{{ form_start(form) }}
+							{{ form_widget(form.submit, { attr: { class: 'btn btn-danger' } }) }}
+							<a href="{{ path('club_show', { id: club.id }) }}" class="btn btn-outline-secondary">Wróć</a>
+						{{ form_end(form) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

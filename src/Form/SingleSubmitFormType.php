@@ -8,19 +8,21 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CodeJoinFormType extends AbstractType
+class SingleSubmitFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('join', SubmitType::class)
+            ->add('submit', SubmitType::class, [
+                'label' => $options['label'],
+            ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            
+            'label' => 'Submit',
         ]);
     }
 }

@@ -8,6 +8,9 @@
     {% for flashError in app.flashes('note') %}
         <div class="alert alert-warning mt-3" role="alert">{{ flashError }}</div>
     {% endfor %}
+		{% for flashSuccess in app.flashes('success') %}
+			<div class="alert alert-success mt-3" role="alert">{{ flashSuccess }}</div>
+		{% endfor %}
 
     <div class="row">
         <div class="col">

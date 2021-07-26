@@ -27,6 +27,8 @@
                     <div class="input-group-text" id="clubOwner">Właściciel</div>
                     <input type="text" class="form-control" placeholder="n/d" aria-label="Kod dostępu" aria-describedby="clubOwner" readonly value="{{ owner }}" />
                 </div>
+                &nbsp;
+                <a href="{{ path('club_leave', { id: club.id }) }}" class="btn btn-outline-danger">Opuść&nbsp;klub</a>
             </div>
         {% endif %}
         </div>

@@ -61,4 +61,15 @@ class GoalController extends AbstractController
 
         return $this->redirectToRoute('club_show', ['id' => $goal->getClub()->getId()]);
     }
+
+    #[Route('/goal/forget/{id<\d+>}', name: 'goal_forget')]
+    public function forget(Goal $goal, UserGoalManager $userGoalManager): Response
+    {
+        if ($this->getUser()->isMember($goal->getClub())) {
+            $userGoalManager->forget($this->getUser(), $goal);
+            $this->addFlash('note', "Cofnięto wykonanie celu <strong><i class='bi {$goal->getIconClassName()}'></i> {$goal->getName()}</strong>!");
+        }
+
+        return $this->redirectToRoute('club_show', ['id' => $goal->getClub()->getId()]);
+    }
 }

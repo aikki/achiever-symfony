@@ -18,7 +18,7 @@ class UserGoalManager {
         $this->userGoalRepository = $userGoalRepository;
     }
 
-    public function achieve(User $user, Goal $goal) {
+    private function findOrCreateUserGoal(User $user, Goal $goal): UserGoal {
         $userGoal = $this->userGoalRepository->findOneByUserAndGoal($user, $goal);
         
         if ($userGoal === null) {
@@ -26,7 +26,20 @@ class UserGoalManager {
             $userGoal->setAchiever($user);
             $userGoal->setGoal($goal);
         }
+
+        return $userGoal;
+    }
+
+    public function achieve(User $user, Goal $goal) {
+        $userGoal = $this->findOrCreateUserGoal($user, $goal);
         $userGoal->setIsAchieved(true);
+        $this->entityManager->persist($userGoal);
+        $this->entityManager->flush();
+    }
+
+    public function forget(User $user, Goal $goal) {
+        $userGoal = $this->findOrCreateUserGoal($user, $goal);
+        $userGoal->setIsAchieved(false);
         $this->entityManager->persist($userGoal);
         $this->entityManager->flush();
     }

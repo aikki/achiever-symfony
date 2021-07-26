@@ -25,16 +25,19 @@ class ClubDataProvider {
 
     private function loadMyClubs() {
         if ($this->token) {
-            $userClubs = $this->token->getUser()->getUserClubs()->toArray();
-            if (!empty($userClubs)) {
-                $clubs = array_map(function ($c) {
-                    return $c->getClub()->setIsOwner($c->getIsOwner());
-                }, $userClubs);
-                usort($clubs, function ($a, $b) {
-                    return strcmp($a->getName(), $b->getName());
-                });
+            $user = $this->token->getUser();
+            if ($user instanceof User) {
+                $userClubs = $user->getUserClubs()->toArray();
+                if (!empty($userClubs)) {
+                    $clubs = array_map(function ($c) {
+                        return $c->getClub()->setIsOwner($c->getIsOwner());
+                    }, $userClubs);
+                    usort($clubs, function ($a, $b) {
+                        return strcmp($a->getName(), $b->getName());
+                    });
+                }
+                $this->myClubs = $clubs;
             }
-            $this->myClubs = $clubs;
         }
     }
 

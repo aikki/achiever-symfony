@@ -24,8 +24,9 @@
             {% for club in myClubs %}
             <li>
               <a class="dropdown-item" href="{{ path('club_show', { id: club.id }) }}">
-                {% if club.isOwner %}<i class="bi bi-star"></i>{% endif %}
+                {% if club.isOwner %}<span class="text-primary"><i class="bi bi-star-fill"></i></span>{% endif %}
                 {{ club.name }}
+                {% if not club.isPublic %}<span class="text-danger"><i class="bi bi-lock-fill"></i></span>{% endif %}
               </a>
             </li>
             {% endfor %}

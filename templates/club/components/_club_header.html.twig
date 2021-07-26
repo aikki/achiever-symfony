@@ -1,6 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ path('club_show', { id: club.id }) }}">{{ club.name }}</a>
+        <a class="navbar-brand" href="{{ path('club_show', { id: club.id }) }}">
+            {% if club.isOwner %}<span class="text-primary"><i class="bi bi-star-fill"></i></span>{% endif %}
+            {{ club.name }}
+            {% if not club.isPublic %}<span class="text-danger"><i class="bi bi-lock-fill"></i></span>{% endif %}
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#clubNavbarSupportedContent" aria-controls="clubNavbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
         </button>

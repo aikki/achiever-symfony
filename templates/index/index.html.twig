@@ -19,7 +19,11 @@
 					{% for club in clubs %}
 						<li class="list-group-item">
 							<div class="d-flex w-100 justify-content-between">
-								<h5 class="mt-1">{% if club.isOwner %}<i class="bi bi-star"></i>{% endif %} {{ club.name }}</h5>
+								<h5 class="mt-1">
+                                    {% if club.isOwner %}<span class="text-primary"><i class="bi bi-star-fill"></i></span>{% endif %}
+                                    {{ club.name }}
+                                    {% if not club.isPublic %}<span class="text-danger"><i class="bi bi-lock-fill"></i></span>{% endif %}
+                                </h5>
 							</div>
                             <div class="d-flex w-100 justify-content-between border-top pt-1">
                                 <p>Cele: <span class="badge bg-success">{{ club.goalsAchievedNumber }}</span>/<span class="badge bg-danger">{{ club.goalsNumber }}</span></p>

@@ -25,11 +25,22 @@ class ClubRepository extends ServiceEntityRepository
     public function getClubPaginator(int $offset): Paginator
     {
         $query = $this->createQueryBuilder('c')
+            ->andWhere('c.isPublic = true')
             ->orderBy('c.name', 'ASC')
             ->setMaxResults(self::PAGINATOR_PER_PAGE)
             ->setFirstResult($offset)
             ->getQuery();
 
         return new Paginator($query);
+    }
+
+    public function findOneByCode($code): ?Club
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.joinCode = :code')
+            ->setParameter('code', $code)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 }

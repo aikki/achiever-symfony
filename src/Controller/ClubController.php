@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Club;
 use App\Entity\UserClub;
 use App\Form\ClubType;
+use App\Form\CodeFormType;
 use App\Form\CodeJoinFormType;
+use App\Form\JoinFormType;
 use App\Repository\ClubRepository;
 use App\Repository\UserClubRepository;
 use App\Service\UserGoalManager;
@@ -25,12 +27,10 @@ class ClubController extends AbstractController
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $clubRepository->getClubPaginator($offset);
 
-        $codeJoin = $this->createForm(CodeJoinFormType::class);
-        $codeJoin->handleRequest($request);
-
-        if ($codeJoin->isSubmitted() && $codeJoin->isValid()) {
-            
-        }
+        $codeJoin = $this->createForm(CodeFormType::class, null, [
+            'action' => $this->generateUrl('club_join'),
+        ]);
+        
 
         return $this->render('club/index.html.twig', [
             'clubs' => $paginator,
@@ -38,7 +38,8 @@ class ClubController extends AbstractController
             'next' => min(count($paginator), $offset + ClubRepository::PAGINATOR_PER_PAGE),
             'perPage' => ClubRepository::PAGINATOR_PER_PAGE,
             'pages' => floor(count($paginator) / ClubRepository::PAGINATOR_PER_PAGE),
-            'offset' => $offset
+            'offset' => $offset,
+            'codeJoin' => $codeJoin->createView(),
         ]);
     }
     
@@ -70,23 +71,66 @@ class ClubController extends AbstractController
         ]);
     }
 
-    #[Route('/clubs/join/{id<\d+>}', name: 'club_join')]
-    public function join(Club $club, EntityManagerInterface $entityManager): Response
+    #[Route('/clubs/join/{code}', name: 'club_join_code')]
+    public function join(Request $request, EntityManagerInterface $entityManager, ClubRepository $clubRepository, UserClubRepository $userClubRepository): Response
     {
-        try {
-            $userClub = new UserClub($this->getUser(), $club);
-            $entityManager->persist($userClub);
-            $entityManager->flush();
+        $code = $request->get('code');
 
-            $this->addFlash('success', 'Dołączono do klubu.');
-            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
-        } catch (Exception $e) {
-            $this->addFlash('error', "Wystąpił błąd przy dołączaniu do klubu.");
-            return $this->redirectToRoute('club');
+        $club = $clubRepository->findOneByCode($code);
+
+        if ($club instanceof Club) {
+            $form = $this->createForm(CodeJoinFormType::class);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                try {
+                    $userClub = new UserClub($this->getUser(), $club);
+                    $entityManager->persist($userClub);
+                    $entityManager->flush();
+        
+                    $this->addFlash('success', 'Dołączono do klubu.');
+                    return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+                } catch (Exception $e) {
+                    $this->addFlash('note', "Wystąpił błąd przy dołączaniu do klubu.");
+                    return $this->redirectToRoute('clubs');
+                }
+            } else {
+                $owner = $userClubRepository->findOwner($club);
+                if ($owner === null) {
+                    $owner = '';
+                } else {
+                    $owner = (string) $owner->getMember();
+                }
+
+                return $this->render('club/join.html.twig', [
+                    'club' => $club,
+                    'owner' => $owner,
+                    'form' => $form->createView(),
+                ]);
+            }
         }
 
+        $this->addFlash('note', "Wystąpił błąd przy dołączaniu do klubu.");
+        return $this->redirectToRoute('clubs');
     }
-    
+
+    #[Route('/clubs/join', methods: [ 'POST' ], name: 'club_join')]
+    public function codeJoin(Request $request): Response
+    {
+        $form = $this->createForm(CodeFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $code = $form->get('code')->getData();
+
+            if (!empty($code)) {
+                return $this->redirectToRoute('club_join_code', [ 'code' => $code ]);
+            }
+        }
+
+        $this->addFlash('note', "Wystąpił błąd przy dołączaniu do klubu.");
+        return $this->redirectToRoute('clubs');
+
+    }
+
     #[Route('/clubs/create', name: 'club_create')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -117,7 +161,7 @@ class ClubController extends AbstractController
     public function regenerateCode(Club $club, EntityManagerInterface $entityManager): Response
     {
         # if owner
-        $club->setJoinCode(substr(bin2hex(random_bytes(7)), 0, 7));
+        $club->regenerateJoinCode();
         $entityManager->persist($club);
         $entityManager->flush();
         

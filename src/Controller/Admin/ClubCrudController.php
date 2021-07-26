@@ -24,6 +24,7 @@ class ClubCrudController extends AbstractCrudController
             ->hideOnIndex()
         ;
         yield BooleanField::new('isPublic');
+        yield TextField::new('joinCode');
         yield DateTimeField::new('createdAt')
             ->onlyOnIndex();
     }

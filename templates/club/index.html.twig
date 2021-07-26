@@ -19,7 +19,7 @@
                         {% if app.user.isMember(club) %}
                             <a href="{{ path('club_show', {id : club.id}) }}" class="btn btn-primary mt-3">Wejdź</a>
                         {% elseif club.isPublic %}
-                            <a href="{{ path('club_join', {id : club.id}) }}" class="btn btn-success mt-3">Dołącz</a>
+                            <a href="{{ path('club_join_code', {code : club.joinCode}) }}" class="btn btn-success mt-3">Dołącz</a>
                         {% else %}
                             <button class="btn btn-danger mt-3" disabled>Prywatny</button>
                         {% endif %}
@@ -53,10 +53,12 @@
                     <h5 class="card-title">Posiadasz kod?</h5>
                     <p class="card-text">Jeśli dostałeś kod dostępu od właściciela prywatnego klubu wpisz go poniżej aby dołączyć:</p>
                     
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="kod dostępu" aria-label="kod dostępu" aria-describedby="button-code-join">
-                        <button class="btn btn-outline-secondary" type="submit" id="button-code-join">Dołącz</button>
-                    </div>
+                    {{ form_start(codeJoin) }}
+                        <div class="input-group mb-3">
+                            {{ form_widget(codeJoin.code, { attr: { class: "form-control", placeholder: "kod dostępu" } }) }}
+                            <button class="btn btn-outline-secondary" type="submit" id="button-code-join">Dołącz</button>
+                        </div>
+                    {{ form_end(codeJoin) }}
                 </div>
             </div>
         </div>

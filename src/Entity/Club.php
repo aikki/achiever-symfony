@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\ClubRepository;
+use Symfony\Component\Form\FormView;
 
 /**
  * @ORM\Entity(repositoryClass=ClubRepository::class)
@@ -197,5 +198,10 @@ class Club
         $this->joinCode = $joinCode;
 
         return $this;
+    }
+
+    public function regenerateJoinCode()
+    {
+        $this->setJoinCode(substr(bin2hex(random_bytes(7)), 0, 7));
     }
 }

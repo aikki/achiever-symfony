@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ club.name }}
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		{% for flashError in app.flashes('note') %}
+			<div class="alert alert-warning mt-3" role="alert">{{ flashError }}</div>
+		{% endfor %}
+		<div class="row">
+			<div class="col">
+				<h2 class="mt-3">Dołączanie do klubu</h2>
+				<div class="card mt-4">
+					<h3 class="card-header">
+						{{ club.name }} {% if not club.isPublic %}<span class="badge bg-danger">Prywatny</span>{% endif %}
+					</h3>
+					<div class="card-body">
+						<h5 class="card-title">{{ club.description }}</h5>
+						<p class="card-text">
+							<span class="text-muted">Właściciel: {{ owner }}</span><br/>
+							<span class="text-muted">Członkowie: {{ club.userClubs|length }}</span><br/>
+							<span class="text-muted">Zdefiniowane cele: {{ club.goals|length }}</span>
+						</p>
+					</div>
+					<div class="card-footer">
+						{{ form_start(form) }}
+							{{ form_widget(form.join, { attr: { class: 'btn btn-success' } }) }}
+							<a href="{{ path('clubs') }}" class="btn btn-outline-secondary">Wróć</a>
+						{{ form_end(form) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

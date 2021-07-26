@@ -15,13 +15,6 @@ class IndexController extends AbstractController
      */
     public function index(Request $request, ClubRepository $clubRepository): Response
     {
-        $offset = max(0, $request->query->getInt('offset', 0));
-        $paginator = $clubRepository->getClubPaginator($offset);
-
-        return $this->render('index/index.html.twig', [
-            'clubs' => $paginator,
-            'prev' => $offset - ClubRepository::PAGINATOR_PER_PAGE,
-            'next' => min(count($paginator), $offset + ClubRepository::PAGINATOR_PER_PAGE)
-        ]);
+        return $this->redirectToRoute('clubs');
     }
 }

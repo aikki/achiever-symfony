@@ -8,10 +8,10 @@
 	{% include 'club/components/_club_header.html.twig' %}
 	<div class="container">
 		{% for flashError in app.flashes('note') %}
-			<div class="alert alert-warning mt-3" role="alert">{{ flashError }}</div>
+			<div class="alert alert-warning mt-3" role="alert">{{ flashError|raw }}</div>
 		{% endfor %}
 		{% for flashSuccess in app.flashes('success') %}
-			<div class="alert alert-success mt-3" role="alert">{{ flashSuccess }}</div>
+			<div class="alert alert-success mt-3" role="alert">{{ flashSuccess|raw }}</div>
 		{% endfor %}
 		<div class="row">
 			<div class="col">

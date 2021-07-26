@@ -56,6 +56,7 @@ class GoalController extends AbstractController
     {
         if ($this->getUser()->isMember($goal->getClub())) {
             $userGoalManager->achieve($this->getUser(), $goal);
+            $this->addFlash('success', "Pomyślnie wykonano cel <strong><i class='bi {$goal->getIconClassName()}'></i> {$goal->getName()}</strong>!");
         }
 
         return $this->redirectToRoute('club_show', ['id' => $goal->getClub()->getId()]);

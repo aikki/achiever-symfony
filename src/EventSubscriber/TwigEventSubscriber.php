@@ -27,7 +27,7 @@ class TwigEventSubscriber implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event)
     {
-        $clubs = $this->clubDataProvider->getMyClubs();
+        $clubs = $this->clubDataProvider->getMyClubsData();
         $this->twig->addGlobal('myClubs', $clubs);
     }
 

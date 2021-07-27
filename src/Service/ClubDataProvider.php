@@ -15,6 +15,7 @@ class ClubDataProvider {
     private $userGoalManager;
     private $token;
     private ?array $myClubs = null;
+    private ?array $myClubsData = null;
 
     public function __construct(ClubRepository $clubRepository, TokenStorageInterface $tokenStorage, GoalRepository $goalRepository, UserGoalManager $userGoalManager) {
         $this->clubRepository = $clubRepository;
@@ -48,31 +49,41 @@ class ClubDataProvider {
         return $this->myClubs;
     }
 
-    public function getMyClubsData() {
-        $clubsData = [];
-        foreach ($this->getMyClubs() as $club) {
-            $goals = $club->getGoals();
-            $this->userGoalManager->fillGoals($this->token->getUser(), ...$goals);
-            $achieved = 0;
-            $goalsAchieved = [];
-            $goalsNotAchieved = [];
-            foreach ($goals as $goal) {
-                if ($goal->getIsAchieved()) {
-                    $achieved++;
-                    $goalsAchieved[] = $goal;
-                } else {
-                    $goalsNotAchieved[] = $goal;
+    private function loadMyClubsData() {
+        if ($this->token) {
+            $clubsData = [];
+            foreach ($this->getMyClubs() as $club) {
+                $goals = $club->getGoals();
+                $this->userGoalManager->fillGoals($this->token->getUser(), ...$goals);
+                $achieved = 0;
+                $goalsAchieved = [];
+                $goalsNotAchieved = [];
+                foreach ($goals as $goal) {
+                    if ($goal->getIsAchieved()) {
+                        $achieved++;
+                        $goalsAchieved[] = $goal;
+                    } else {
+                        $goalsNotAchieved[] = $goal;
+                    }
                 }
-            }
             
-            $data = new ClubData();
-            $data->setClub($club);
-            $data->setGoals($goals);
-            $data->setGoalsAchievedNumber($achieved);
-            $data->setGoalsAchieved($goalsAchieved);
-            $data->setGoalsNotAchieved($goalsNotAchieved);
-            $clubsData[] = $data;
+                $data = new ClubData();
+                $data->setClub($club);
+                $data->setGoals($goals);
+                $data->setGoalsAchievedNumber($achieved);
+                $data->setGoalsAchieved($goalsAchieved);
+                $data->setGoalsNotAchieved($goalsNotAchieved);
+                $clubsData[] = $data;
+            }
+            $this->myClubsData = $clubsData;
+            return $this->myClubsData;
         }
-        return $clubsData;
+    }
+
+    public function getMyClubsData($forceReload = false) {
+        if ($this->myClubsData === null || $forceReload) {
+            $this->loadMyClubsData();
+        }
+        return $this->myClubsData;
     }
 }

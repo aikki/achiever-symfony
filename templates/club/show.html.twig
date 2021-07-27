@@ -14,8 +14,8 @@
 			<div class="alert alert-success mt-3" role="alert">{{ flashSuccess|raw }}</div>
 		{% endfor %}
 		<div class="row">
-			<div class="col">
             <h2 class="mt-3">Cele w klubie</h2>
+			<div class="col">
 				{% if goals is not empty %}
 				<ul class="list-group mt-4">
 					{% for goal in goals %}
@@ -59,6 +59,18 @@
 						{% endif %}
 					</p>
 				{% endif %}
+			</div>
+			<div class="col-12 col-lg-3">
+				<div class="card mt-4">
+					<div class="card-body">
+						<h5 class="card-title">O klubie</h5>
+						<p class="card-text">
+							<i class="bi bi-calendar-event" data-bs-toggle="tooltip" data-bs-placement="left" title="Data założenia"></i> {{ club.createdAt|date('d-m-Y h:i') }}<br/>
+							<i class="bi bi-bullseye" data-bs-toggle="tooltip" data-bs-placement="left" title="Ilość celów"></i> {{ goals|length }}<br/>
+							<i class="bi bi-people" data-bs-toggle="tooltip" data-bs-placement="left" title="Ilość członków"></i> {{ club.userClubs|length }}<br/>
+						</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

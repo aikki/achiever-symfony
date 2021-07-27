@@ -22,13 +22,15 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for club in myClubs %}
-            <li>
-              <a class="dropdown-item" href="{{ path('club_show', { id: club.id }) }}">
-                {% if club.isOwner %}<span class="text-primary"><i class="bi bi-star-fill"></i></span>{% endif %}
-                {{ club.name }}
-                {% if not club.isPublic %}<span class="text-danger"><i class="bi bi-lock-fill"></i></span>{% endif %}
-              </a>
-            </li>
+              {% if club.goalsNotAchieved|length > 0 or club.isOwner %}
+                <li>
+                  <a class="dropdown-item {% if club.goalsNotAchieved|length <= 0 %}text-muted{% endif %}" href="{{ path('club_show', { id: club.id }) }}">
+                    {% if club.isOwner %}<span class="text-primary"><i class="bi bi-star-fill"></i></span>{% endif %}
+                    {{ club.name }}
+                    {% if not club.isPublic %}<span class="text-danger"><i class="bi bi-lock-fill"></i></span>{% endif %}
+                  </a>
+                </li>
+              {% endif %}
             {% endfor %}
             <li><hr class="dropdown-divider" /></li>
             <li><a class="dropdown-item" href="{{ path('club_create') }}">Stwórz klub</a></li>

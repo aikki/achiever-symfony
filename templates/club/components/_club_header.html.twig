@@ -23,8 +23,7 @@
         {% if is_owner %}
         <div class="d-flex">
             <div class="input-group">
-                <div class="input-group-text" id="btnGroupAddon2">Kod dostępu</div>
-                <input type="text" class="form-control" placeholder="xxxxxxx" aria-label="Kod dostępu" aria-describedby="btnGroupAddon2" readonly value="{{ club.joinCode }}" />
+                <button type="button" class="btn btn-outline-light border-end" id="btnGroupAddon2" data-bs-toggle="modal" data-bs-target="#joinCodeModal" aria-expanded="false" aria-controls="joinCode">Kod dostępu</button>
                 <a href="{{ path('club_regenerate_code', { id: club.id }) }}" class="btn btn-success">Wygeneruj nowy</a>
             </div>
         </div>
@@ -40,4 +39,24 @@
         {% endif %}
         </div>
     </div>
+
+    {% if is_owner %}
+    <div class="modal fade" id="joinCodeModal" tabindex="-1" aria-labelledby="joinCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinCodeModalLabel">Kod dostępu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control text-center" placeholder="xxxxxxx" aria-label="Kod dostępu" aria-describedby="btnGroupAddon2" readonly value="{{ club.joinCode }}" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
 </nav>

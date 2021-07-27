@@ -185,7 +185,7 @@ class ClubController extends AbstractController
             $entityManager->flush();
             $this->addFlash('success', "Pomyślnie wygenerowano nowy kod dostępu.");
         } else {
-            $this->addFlash('note', "Nie jesteś właścicielem klubu.");
+            $this->addFlash('note', "Nie jesteś właścicielem tego klubu.");
         }
         
         return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
@@ -197,10 +197,10 @@ class ClubController extends AbstractController
         $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
 
         if ($userClub === null) {
-            $this->addFlash('note', "Nie należysz do tego klubu.");
+            $this->addFlash('note', 'Nie należysz do tego klubu.');
         }
         if ($userClub->getIsOwner()) {
-            $this->addFlash('note', "Nie możesz opuścić klubu, którego jesteś właścicielem.");
+            $this->addFlash('note', 'Nie możesz opuścić klubu, którego jesteś właścicielem.');
             return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
         } else {
             $form = $this->createForm(SingleSubmitFormType::class, null, [ 'label' => 'Leave' ]);
@@ -209,7 +209,7 @@ class ClubController extends AbstractController
                 $entityManager->remove($userClub);
                 $entityManager->flush();
 
-                $this->addFlash('success', "Pomyślnie opuściłeś klub.");
+                $this->addFlash('success', 'Pomyślnie opuściłeś klub.');
             } else {
                 return $this->render('club/leave.html.twig', [
                     'club' => $club,
@@ -221,5 +221,34 @@ class ClubController extends AbstractController
         }
         
         return $this->redirectToRoute('clubs');
+    }
+
+    #[Route('/clubs/manage/{id<\d+>}', name: 'club_manage')]
+    public function manage(Club $club, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+        if (!$userClub->getIsOwner()) {
+            $this->addFlash('note', 'Nie jesteś właścicielem tego klubu');
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        }
+
+        $form = $this->createForm(ClubType::class, $club);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+            $entityManager->persist($club);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Pomyślnie zapisano zmiany.');
+
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        }
+
+        return $this->render('club/manage.html.twig', [
+            'club' => $club,
+            'is_owner' => true,
+            'form' => $form->createView(),
+        ]);
     }
 }

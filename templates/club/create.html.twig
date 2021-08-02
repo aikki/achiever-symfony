@@ -19,6 +19,9 @@
                 <div class="mb-3 form-check form-switch">
                     <label class="form-check-label" for="club_isPublic">Klub publiczny</label>
                     {{ form_widget(form.isPublic, { attr: { class: 'form-check-input' } }) }}
+                    <div class="form-text">
+                        Kluby publiczne wyświetlane są na liście klubów. Do klubów prywatnych dołączyć można wyłącznie używając kodu dostępu.
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Stwórz</button>
             {{ form_end(form) }}

@@ -59,10 +59,16 @@ class Club
 
     private $isOwner;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Milestone::class, mappedBy="club", orphanRemoval=true)
+     */
+    private $milestones;
+
     public function __construct()
     {
         $this->goals = new ArrayCollection();
         $this->userClubs = new ArrayCollection();
+        $this->milestones = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -215,6 +221,36 @@ class Club
     public function setIsOwner(?bool $isOwner): self
     {
         $this->isOwner = $isOwner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Milestone[]
+     */
+    public function getMilestones(): Collection
+    {
+        return $this->milestones;
+    }
+
+    public function addMilestone(Milestone $milestone): self
+    {
+        if (!$this->milestones->contains($milestone)) {
+            $this->milestones[] = $milestone;
+            $milestone->setClub($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMilestone(Milestone $milestone): self
+    {
+        if ($this->milestones->removeElement($milestone)) {
+            // set the owning side to null (unless already changed)
+            if ($milestone->getClub() === $this) {
+                $milestone->setClub(null);
+            }
+        }
 
         return $this;
     }

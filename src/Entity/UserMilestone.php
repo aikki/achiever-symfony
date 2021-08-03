@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\UserGoalRepository;
+use App\Repository\UserMilestoneRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=UserGoalRepository::class)
+ * @ORM\Entity(repositoryClass=UserMilestoneRepository::class)
  */
-class UserGoal
+class UserMilestone
 {
     /**
      * @ORM\Id
@@ -18,26 +18,21 @@ class UserGoal
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="userMilestones")
      * @ORM\JoinColumn(nullable=false)
      */
     private $achiever;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Goal::class)
+     * @ORM\ManyToOne(targetEntity=Milestone::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $goal;
+    private $milestone;
 
     /**
      * @ORM\Column(type="boolean")
      */
     private $isAchieved;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isLocked;
 
     public function getId(): ?int
     {
@@ -56,14 +51,14 @@ class UserGoal
         return $this;
     }
 
-    public function getGoal(): ?Goal
+    public function getMilestone(): ?Milestone
     {
-        return $this->goal;
+        return $this->milestone;
     }
 
-    public function setGoal(?Goal $goal): self
+    public function setMilestone(?Milestone $milestone): self
     {
-        $this->goal = $goal;
+        $this->milestone = $milestone;
 
         return $this;
     }
@@ -76,18 +71,6 @@ class UserGoal
     public function setIsAchieved(bool $isAchieved): self
     {
         $this->isAchieved = $isAchieved;
-
-        return $this;
-    }
-
-    public function getIsLocked(): ?bool
-    {
-        return $this->isLocked;
-    }
-
-    public function setIsLocked(bool $isLocked): self
-    {
-        $this->isLocked = $isLocked;
 
         return $this;
     }

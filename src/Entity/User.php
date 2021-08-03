@@ -60,9 +60,15 @@ class User implements UserInterface
      */
     private $userClubs;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserMilestone::class, mappedBy="achiever", orphanRemoval=true)
+     */
+    private $userMilestones;
+
     public function __construct()
     {
         $this->userClubs = new ArrayCollection();
+        $this->userMilestones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -229,5 +235,35 @@ class User implements UserInterface
         return !$this->getUserClubs()->forAll(function($key, $userClub) use ($club) {
             return $userClub->getClub() !== $club;
         });
+    }
+
+    /**
+     * @return Collection|UserMilestone[]
+     */
+    public function getUserMilestones(): Collection
+    {
+        return $this->userMilestones;
+    }
+
+    public function addUserMilestone(UserMilestone $userMilestone): self
+    {
+        if (!$this->userMilestones->contains($userMilestone)) {
+            $this->userMilestones[] = $userMilestone;
+            $userMilestone->setAchiever($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserMilestone(UserMilestone $userMilestone): self
+    {
+        if ($this->userMilestones->removeElement($userMilestone)) {
+            // set the owning side to null (unless already changed)
+            if ($userMilestone->getAchiever() === $this) {
+                $userMilestone->setAchiever(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ club.name }}
+{% endblock %}
+
+{% block body %}
+	{% include 'club/components/_club_header.html.twig' %}
+	<div class="container">
+		{% for flashError in app.flashes('note') %}
+			<div class="alert alert-warning mt-3" role="alert">{{ flashError|raw }}</div>
+		{% endfor %}
+		{% for flashSuccess in app.flashes('success') %}
+			<div class="alert alert-success mt-3" role="alert">{{ flashSuccess|raw }}</div>
+		{% endfor %}
+		<div class="row">
+            <h2 class="mt-3">Kamienie milowe</h2>
+			<div class="col">
+				{% if milestones is not empty %}
+				<ul class="list-group mt-4">
+					{% for milestone in milestones %}
+						<li class="list-group-item">
+							<div class="row">
+								<div class="col-auto">
+									<div class="milestone {% if milestone.isDone %}done text-light{% else %}text-dark{% endif %}">
+										<h2 class="mx-2 my-2">
+										<i class="{{ milestone.iconClassName | default("bi-trophy")  }}"></i>
+										</h2>
+									</div>
+								</div>
+								<div class="col">
+									<div class="d-flex w-100 justify-content-between">
+										<h5 class="mb-1 mt-2">
+										{{ milestone.name }}
+										</h5>
+									</div>
+
+									<p class="text-muted">{{ milestone.description }}</p>
+									<div>
+										{% for goal in milestone.goals %}
+											<button class="btn btn-outline-light"
+													data-bs-toggle="popover"
+													title="{{ goal.name }}"
+													data-bs-content="{{ goal.description }}"
+													data-bs-trigger="hover"
+													data-bs-placement="bottom"
+											>
+												<i class="bi  {{ goal.iconClassName | default("bi-star") }} {% if goal.isAchieved %}text-success{% else %}text-danger{% endif %}"></i>
+											</button>
+										{% endfor %}
+									</div>
+								</div>
+								<div class="col-12 col-md-auto text-end text-md-start">
+									{% if milestone.isDone %}
+										<div class="btn-group w-100">
+											<button disabled class="btn btn-primary">Odblokowane</button>
+										</div>
+									{% elseif milestone.isDone is null %}
+										<button disabled class="btn btn-dark">Status nieznany, odśwież stronę</button>
+									{% elseif not milestone.canBeDone %}
+										<button disabled class="btn btn-dark">Wykonaj wszystkie cele</button>
+									{% else %}
+										<a class="btn btn-success w-100" href="{{ path('milestone_achieve', { id: milestone.id }) }}">Odblokuj</a>
+									{% endif %}
+								</div>
+							</div>
+						</li>
+					{% endfor %}
+				</ul>
+				{% else %}
+					<p class="text-muted">
+						Nie zdefiniowano jeszcze żadnych celów.
+						{% if is_owner %}
+						<br/><a href="{{ path('milestone_create', { id: club.id }) }}">Utwórz kamień milowy</a>
+						{% endif %}
+					</p>
+				{% endif %}
+			</div>
+			<div class="col-12 col-lg-3">
+				<div class="card mt-4">
+					<div class="card-body">
+						<h5 class="card-title">Kamienie milowe</h5>
+						<p class="card-text">
+							To specjalne osiągnięcia, możliwe do odblokowania po wykonaniu określonych celi w klubie.
+						</p>
+						<p class="card-text text-danger">
+							Uwaga, odblokowanie kamienia milowego jest nieodwracalne i blokuje możliwość cofnięcia celów!
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Club;
+use App\Entity\User;
 use App\Entity\UserClub;
 use App\Form\ClubType;
 use App\Form\CodeFormType;
@@ -10,6 +11,7 @@ use App\Form\SingleSubmitFormType;
 use App\Repository\ClubRepository;
 use App\Repository\UserClubRepository;
 use App\Service\UserGoalManager;
+use App\Service\UserMilestoneManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,13 +65,38 @@ class ClubController extends AbstractController
 
         $owner = $this->getClubOwner($club);
 
-        $goals = $userGoalManager->fillGoals($this->getUser(), ...$club->getGoals());
+        $userGoalManager->fillGoals($this->getUser(), ...$club->getGoals());
 
         return $this->render('club/show.html.twig', [
             'club' => $club,
             'is_owner' => $userClub->getIsOwner(),
             'owner' => $owner,
-            'goals' => $goals,
+            'goals' => $club->getGoals(),
+        ]);
+    }
+
+    #[Route('/clubs/{id<\d+>}/milestones', name: 'club_show_milestones')]
+    public function showMilestones(Club $club, Request $request, UserGoalManager $userGoalManager, UserMilestoneManager $userMilestoneManager): Response
+    {
+        $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+
+        if ($userClub === null) {
+            $this->addFlash('note', "Nie należysz do klubu {$club->getName()}");
+
+            return $this->redirectToRoute('clubs');
+        }
+
+        $owner = $this->getClubOwner($club);
+
+        $milestones = $club->getMilestones();
+        $userGoalManager->fillGoals($this->getUser(), ...$club->getGoals());
+        $userMilestoneManager->fillMilestones($this->getUser(), ...$milestones);
+
+        return $this->render('club/milestones.html.twig', [
+            'club' => $club,
+            'is_owner' => $userClub->getIsOwner(),
+            'owner' => $owner,
+            'milestones' => $milestones,
         ]);
     }
 

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GoalRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,6 +41,18 @@ class Goal
      * @ORM\Column(type="string", length=255)
      */
     private $iconClassName;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Milestone::class, mappedBy="goals")
+     */
+    private $milestones;
+
+    private $isLocked;
+
+    public function __construct()
+    {
+        $this->milestones = new ArrayCollection();
+    }
 
     public function __toString(): string
     {
@@ -106,6 +120,45 @@ class Goal
     public function setIconClassName(string $iconClassName): self
     {
         $this->iconClassName = $iconClassName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Milestone[]
+     */
+    public function getMilestones(): Collection
+    {
+        return $this->milestones;
+    }
+
+    public function addMilestone(Milestone $milestone): self
+    {
+        if (!$this->milestones->contains($milestone)) {
+            $this->milestones[] = $milestone;
+            $milestone->addGoal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMilestone(Milestone $milestone): self
+    {
+        if ($this->milestones->removeElement($milestone)) {
+            $milestone->removeGoal($this);
+        }
+
+        return $this;
+    }
+
+    public function getIsLocked(): ?bool
+    {
+        return $this->isLocked;
+    }
+
+    public function setIsLocked(bool $isLocked): self
+    {
+        $this->isLocked = $isLocked;
 
         return $this;
     }

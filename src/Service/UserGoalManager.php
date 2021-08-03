@@ -37,22 +37,31 @@ class UserGoalManager {
         $this->entityManager->flush();
     }
 
-    public function forget(User $user, Goal $goal) {
+    public function forget(User $user, Goal $goal) : bool {
         $userGoal = $this->findOrCreateUserGoal($user, $goal);
+        if ($userGoal->getIsLocked()) {
+            return false;
+        }
         $userGoal->setIsAchieved(false);
         $this->entityManager->persist($userGoal);
         $this->entityManager->flush();
+        return true;
     }
 
     public function fillGoals(User $user, Goal ...$goals) {
+        $goals = array_filter($goals, function ($goal) {
+            return $goal->getIsAchieved() === null;
+        });
         $userGoals = $this->userGoalRepository->findByGoalsAndUser($user, ...$goals);
 
         foreach ($goals as $goal) {
             $goal->setIsAchieved(false);
+            $goal->setIsLocked(false);
             foreach ($userGoals as $userGoal) {
-                if ($goal == $userGoal->getGoal()) {
+                if ($goal === $userGoal->getGoal()) {
                     $goal->setIsAchieved($userGoal->getIsAchieved());
-                    continue;
+                    $goal->setIsLocked($userGoal->getIsLocked());
+                    break;
                 }
             }
         }

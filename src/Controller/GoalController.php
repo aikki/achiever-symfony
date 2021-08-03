@@ -66,8 +66,11 @@ class GoalController extends AbstractController
     public function forget(Goal $goal, UserGoalManager $userGoalManager): Response
     {
         if ($this->getUser()->isMember($goal->getClub())) {
-            $userGoalManager->forget($this->getUser(), $goal);
-            $this->addFlash('note', "Cofnięto wykonanie celu <strong><i class='bi {$goal->getIconClassName()}'></i> {$goal->getName()}</strong>!");
+            if ($userGoalManager->forget($this->getUser(), $goal)) {
+                $this->addFlash('success', "Cofnięto wykonanie celu <strong><i class='bi {$goal->getIconClassName()}'></i> {$goal->getName()}</strong>!");
+            } else {
+                $this->addFlash('note', "Nie można cofnąć celu <strong><i class='bi {$goal->getIconClassName()}'></i> {$goal->getName()}</strong>.");
+            }
         }
 
         return $this->redirectToRoute('club_show', ['id' => $goal->getClub()->getId()]);

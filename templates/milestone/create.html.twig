@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stwórz kamień milowy{% endblock %}
+
+{% block body %}
+{% include 'club/components/_club_header.html.twig' %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2 class="mt-3">Stwórz kamień milowy</h2>
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.name, 'Nazwa', { label_attr: { class: 'form-label' } }) }}
+                    {{ form_widget(form.name, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.description, 'Opis', { label_attr: { class: 'form-label' } }) }}
+                    {{ form_widget(form.description, { attr: { class: 'form-control' } }) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.goals, 'Cele', { label_attr: { class: 'form-label' } }) }}
+                    <div class="form-control">
+                        <div class="row">
+                        {% for choice in form.goals.children %}
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="form-check">
+                                    {{ form_widget(choice, { attr: { class: 'form-check-input' } }) }}
+                                    {{ form_label(choice, null, { label_attr: { class: 'form-check-label' } }) }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.iconClassName, 'Ikona', { label_attr: { class: 'form-label' } }) }}
+                    <div class="form-control icon-choice">
+                    {% for choice in form.iconClassName.children %}
+                        {{ form_widget(choice) }}
+                        {{ form_label(choice, null, { label_attr: { class: 'btn btn-lg btn-outline-secondary mb-1' } }) }}
+                    {% endfor %}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Stwórz</button>
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

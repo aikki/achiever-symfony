@@ -33,6 +33,7 @@ class UserGoalManager {
     public function achieve(User $user, Goal $goal) {
         $userGoal = $this->findOrCreateUserGoal($user, $goal);
         $userGoal->setIsAchieved(true);
+        $userGoal->setIsLocked(false);
         $this->entityManager->persist($userGoal);
         $this->entityManager->flush();
     }

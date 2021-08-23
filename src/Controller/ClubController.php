@@ -46,7 +46,7 @@ class ClubController extends AbstractController
             'prev' => $offset - ClubRepository::PAGINATOR_PER_PAGE,
             'next' => min(count($paginator), $offset + ClubRepository::PAGINATOR_PER_PAGE),
             'perPage' => ClubRepository::PAGINATOR_PER_PAGE,
-            'pages' => floor(count($paginator) / ClubRepository::PAGINATOR_PER_PAGE),
+            'pages' => max(ceil(count($paginator) / ClubRepository::PAGINATOR_PER_PAGE) - 1, 0),
             'offset' => $offset,
             'codeJoin' => $codeJoin->createView(),
         ]);
@@ -183,17 +183,17 @@ class ClubController extends AbstractController
 
     private function getClubOwner(Club $club, bool $object = false) {
         if (empty($this->clubOwner)) {
-            $this->userOwner = $this->userClubRepository->findOwner($club);
+            $this->clubOwner = $this->userClubRepository->findOwner($club);
         }
         
         if ($object) {
-            return $this->userOwner;
+            return $this->clubOwner;
         }
 
-        if ($this->userOwner === null) {
+        if ($this->clubOwner === null) {
             return '';
         } else {
-            return (string) $this->userOwner->getMember();
+            return (string) $this->clubOwner->getMember();
         }
     }
     
@@ -225,8 +225,7 @@ class ClubController extends AbstractController
 
         if ($userClub === null) {
             $this->addFlash('note', 'Nie należysz do tego klubu.');
-        }
-        if ($userClub->getIsOwner()) {
+        } else if ($userClub->getIsOwner()) {
             $this->addFlash('note', 'Nie możesz opuścić klubu, którego jesteś właścicielem.');
             return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
         } else {
@@ -254,6 +253,10 @@ class ClubController extends AbstractController
     public function manage(Club $club, Request $request, EntityManagerInterface $entityManager): Response
     {
         $userClub = $this->userClubRepository->findOneByUserAndClub($this->getUser(), $club);
+        if ($userClub === null) {
+            $this->addFlash('note', 'Nie należysz do tego klubu');
+            return $this->redirectToRoute('clubs');
+        }
         if (!$userClub->getIsOwner()) {
             $this->addFlash('note', 'Nie jesteś właścicielem tego klubu');
             return $this->redirectToRoute('club_show', ['id' => $club->getId()]);

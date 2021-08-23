@@ -41,7 +41,7 @@
 											<button class="btn btn-outline-light"
 													data-bs-toggle="popover"
 													title="{{ goal.name }}"
-													data-bs-content="{{ goal.description }}"
+													{% if (goal.description is not empty) %}data-bs-content="{{ goal.description }}"{% endif %}
 													data-bs-trigger="hover"
 													data-bs-placement="bottom"
 											>

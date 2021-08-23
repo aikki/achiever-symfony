@@ -29,6 +29,7 @@ class ClubDataProvider {
             $user = $this->token->getUser();
             if ($user instanceof User) {
                 $userClubs = $user->getUserClubs()->toArray();
+                $clubs = [];
                 if (!empty($userClubs)) {
                     $clubs = array_map(function ($c) {
                         return $c->getClub()->setIsOwner($c->getIsOwner());
@@ -50,7 +51,7 @@ class ClubDataProvider {
     }
 
     private function loadMyClubsData() {
-        if ($this->token) {
+        if ($this->token && $this->token->getUser() instanceof User) {
             $clubsData = [];
             foreach ($this->getMyClubs() as $club) {
                 $goals = $club->getGoals();

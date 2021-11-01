@@ -104,15 +104,19 @@ class ClubController extends AbstractController
     public function join(Request $request, EntityManagerInterface $entityManager, ClubRepository $clubRepository, UserClubRepository $userClubRepository): Response
     {
         $code = $request->get('code');
-
         $club = $clubRepository->findOneByCode($code);
+        $user = $this->getUser();
 
         if ($club instanceof Club) {
+            if ($user->isMember($club)) {
+                $this->addFlash('note', 'Już należysz do tego klubu.');
+                return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+            }
             $form = $this->createForm(SingleSubmitFormType::class, null, [ 'label' => 'Join' ]);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 try {
-                    $userClub = new UserClub($this->getUser(), $club);
+                    $userClub = new UserClub($user, $club);
                     $entityManager->persist($userClub);
                     $entityManager->flush();
         
